@@ -2,9 +2,11 @@
 // Vertex shader program
 var VSHADER_SOURCE = `
     attribute vec4 a_Position;
+    uniform float u_Size;
     void main(){
         gl_Position = a_Position;
-        gl_PointSize = 20.0;
+        //gl_PointSize = 20.0;
+        gl_PointSize = u_Size;
     }`
 
     // Coordinates
@@ -25,6 +27,7 @@ let canvas;
 let gl;
 let a_Position;
 let u_FragColor;
+let u_Size;
 
 function setupWebGL(){
     // Retrieve <canvas> element
@@ -58,21 +61,32 @@ function connectVariablesToGSL(){
         console.log('Fail to get the storage location of u_FragColor');
         return;
     }
+
+    // Get the storage location of u_Sizevariable
+    u_Size = gl.getUniformLocation(gl.program, 'u_Size');
+    if (!u_Size) {
+        console.log('Fail to get the storage location of u_Size');
+        return;
+    }
 }
 
+//globals related to UI elements
 let g_selectedColor = [1.0, 1.0, 1.0, 1.0]; //white starting
-
+let selectedSize = 5;
 //set up actions for HTML UI elements
 function addActionsForHtmlUI(){
 
     //button events (shape type)
     document.getElementById('green').onclick = function() { g_selectedColor = [0.0,1.0,0.0,1.0]; };
-    document.getElementById('red').onclick = function() { g_selectedColor = [1.0,0.0,0.0,1.0] };
+    document.getElementById('red').onclick = function() { g_selectedColor = [1.0,0.0,0.0,1.0]; };
 
     //Slider events
-    document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0]} );
-    document.getElementById('greenSlide').addEventListener('mouseup', function() { g_selectedColor[1]} );
-    document.getElementById('blueSlide').addEventListener('mouseup', function() { g_selectedColor[2]} );
+    document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0]; } );
+    document.getElementById('greenSlide').addEventListener('mouseup', function() { g_selectedColor[1]; } );
+    document.getElementById('blueSlide').addEventListener('mouseup', function() { g_selectedColor[2]; } );
+
+    //size slider events
+    document.getElementById('sizeSlide').addEventListener('mouseup', function() { selectedSize = this.value; } );
 
 }
 
@@ -95,6 +109,7 @@ function main() {
 
 var g_points = []; // The array for a mouse press
 var g_colors = []; // The array to store the color of a point
+var g_sizes = [];
 
 function click(ev) {
   //extract the event click and return it in WebGL coordinates
@@ -106,6 +121,9 @@ function click(ev) {
 
   // Store the color to the g_colors array
   g_colors.push(g_selectedColor.slice());
+
+    //store the size to the g sizes array
+    g_sizes.push(g_selectedSize);
 
   // Store the color to g_colors array
   /*if(x >= 0.0 && y >= 0.0) { // First quadrant
@@ -144,6 +162,8 @@ function renderAllShapes(){
     gl.vertexAttrib3f(a_Position, xy[0], xy[1], 0.0);
     // Pass the color of a point to u_FragColor variable
     gl.uniform4f(u_FragColor, rgba[0],rgba[1],rgba[2],rgba[3]);                             <-(3)
+    
+    gluniform1f(u_Size, size);
     // Draw a point
     gl.drawArrays(gl.POINTS, 0, 1);
   }
