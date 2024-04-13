@@ -79,6 +79,8 @@ function addActionsForHtmlUI(){
     //button events (shape type)
     document.getElementById('green').onclick = function() { g_selectedColor = [0.0,1.0,0.0,1.0]; };
     document.getElementById('red').onclick = function() { g_selectedColor = [1.0,0.0,0.0,1.0]; };
+    document.getElementById('clear').onclick = function() { g_shapesList=[]; renderAllShapes(); };
+
 
     //Slider events
     document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0]; } );
@@ -87,6 +89,7 @@ function addActionsForHtmlUI(){
 
     //size slider events
     document.getElementById('sizeSlide').addEventListener('mouseup', function() { selectedSize = this.value; } );
+
 
 }
 
