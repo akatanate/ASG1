@@ -33,8 +33,11 @@ function setupWebGL(){
     // Retrieve <canvas> element
     canvas = document.getElementById('webgl');
 
+    //gl = getWedGLContext(canvas);
+
     // Get the rendering context for WebGL
-    gl = getWebGLContext(canvas);
+    gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
+
     if (!gl) {
         console.log('Failed to get the rendering context for WebGL');
         return;
@@ -102,6 +105,7 @@ function main() {
  
     // Register function (event handler) to be called on a mouse press
     canvas.onmousedown = click;
+    canvas.onmousemove = click = function(ev){ if(ev.buttons == 1) { click(ev) } };
 
     // Set the color for clearing <canvas>
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -167,15 +171,30 @@ function convertCoordinatesEventToGL(ev){
 
 
 function renderAllShapes(){
+    // Check the time at the start of this function
+    var startTime = performance.now();
+
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
 
-  var len = g_points.length;
+// Draw each shape in the list
+  var len = g_shapesList.length;
   for(var i = 0; i < len; i++) {
-
-    g_shapesList.render();
-
-
+    g_shapesList[i].render();
   }
 
+  //check time at end of function, show on pg
+  var duration = performance.now() - startTime;
+  sendTextToHTML("numdot: " + len + " ms: " + Math.floor(duration) + " fps: " + Math.floor(10000/duration)/10, "numdot");
+
+}
+
+// set the text of a HTML element
+function sendTextToHTML(text, htmlID){
+    var htmlElm = document.getElementById(htmlID);
+    if(!htmlElm){
+        console.log("Failed to get " + htmlID + " from HTML");
+        return;
+    }
+    htmlElm.innerHTML = text;
 }
