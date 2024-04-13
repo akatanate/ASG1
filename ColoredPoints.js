@@ -60,6 +60,23 @@ function connectVariablesToGSL(){
     }
 }
 
+let g_selectedColor = [1.0, 1.0, 1.0, 1.0]; //white starting
+
+//set up actions for HTML UI elements
+function addActionsForHtmlUI(){
+
+    //button events (shape type)
+    document.getElementById('green').onclick = function() { g_selectedColor = [0.0,1.0,0.0,1.0]; };
+    document.getElementById('red').onclick = function() { g_selectedColor = [1.0,0.0,0.0,1.0] };
+
+    //Slider events
+    document.getElementById('redSlide').addEventListener('mouseup', function() { g_selectedColor[0]} );
+    document.getElementById('greenSlide').addEventListener('mouseup', function() { g_selectedColor[1]} );
+    document.getElementById('blueSlide').addEventListener('mouseup', function() { g_selectedColor[2]} );
+
+}
+
+
 function main() {
 
     setupWebGL();
@@ -81,19 +98,23 @@ var g_colors = []; // The array to store the color of a point
 
 function click(ev) {
   //extract the event click and return it in WebGL coordinates
+  // let can see in local vars, or just type in the var in console to see same thing
   [x, y] = convertCoordinatesEventToGL(ev);
 
   // Store the coordinates to g_points array
   g_points.push([x, y]);
 
+  // Store the color to the g_colors array
+  g_colors.push(g_selectedColor.slice());
+
   // Store the color to g_colors array
-  if(x >= 0.0 && y >= 0.0) { // First quadrant
+  /*if(x >= 0.0 && y >= 0.0) { // First quadrant
     g_colors.push([1.0, 0.0, 0.0, 1.0]); // Red
   } else if(x < 0.0 && y < 0.0) { // Third quadrant
     g_colors.push([0.0, 1.0, 0.0, 1.0]); // Green
   } else { // Others
     g_colors.push([1.0, 1.0, 1.0, 1.0]); // White
-  }
+  }*/
 
   //Draw every shape that is supposed to be in the canvas
   renderAllShapes();
@@ -106,6 +127,7 @@ function convertCoordinatesEventToGL(ev){
   
     x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
     y = (canvas.height/2 - (y - rect.top))/(canvas.height/2)
+
     return([x, y]);
 }
 
@@ -125,5 +147,5 @@ function renderAllShapes(){
     // Draw a point
     gl.drawArrays(gl.POINTS, 0, 1);
   }
-  
+
 }
